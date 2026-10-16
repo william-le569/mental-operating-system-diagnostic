@@ -1,0 +1,581 @@
+<!DOCTYPE html>
+<html lang="vi" class="dark h-full">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Mental OS Health Diagnostic | Hệ Thống Vận Hành Tinh Thần</title>
+    <!-- Tailwind CSS CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            darkMode: 'class',
+            theme: {
+                extend: {
+                    colors: {
+                        brand: {
+                            50: '#f0fdfa',
+                            500: '#14b8a6',
+                            600: '#0d9488',
+                            900: '#134e4a',
+                            950: '#042f2e',
+                        },
+                        status: {
+                            optimal: '#10b981',
+                            caution: '#f59e0b',
+                            critical: '#ef4444'
+                        }
+                    },
+                    fontFamily: {
+                        sans: ['Inter', 'system-ui', 'sans-serif'],
+                        mono: ['JetBrains Mono', 'monospace'],
+                    }
+                }
+            }
+        }
+    </script>
+    <!-- FontAwesome Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #090d16;
+            color: #f3f4f6;
+        }
+        
+        /* Custom Slider Styling */
+        input[type=range] {
+            -webkit-appearance: none;
+            background: transparent;
+        }
+        input[type=range]:focus {
+            outline: none;
+        }
+        input[type=range]::-webkit-slider-thumb {
+            -webkit-appearance: none;
+            height: 20px;
+            width: 20px;
+            border-radius: 50%;
+            background: #38bdf8;
+            cursor: pointer;
+            margin-top: -6px;
+            box-shadow: 0 0 10px rgba(56, 189, 248, 0.5);
+            transition: all 0.2s ease;
+        }
+        input[type=range]::-webkit-slider-thumb:hover {
+            transform: scale(1.15);
+            box-shadow: 0 0 15px rgba(56, 189, 248, 0.8);
+        }
+        input[type=range]::-webkit-slider-runnable-track {
+            width: 100%;
+            height: 8px;
+            cursor: pointer;
+            background: #1e293b;
+            border-radius: 4px;
+            border: 1px solid #334155;
+        }
+
+        .glass-card {
+            background: rgba(15, 23, 42, 0.75);
+            backdrop-filter: blur(12px);
+            border: 1px solid rgba(255, 255, 255, 0.08);
+        }
+
+        .glow-optimal {
+            box-shadow: 0 0 25px -5px rgba(16, 185, 129, 0.25);
+        }
+        .glow-caution {
+            box-shadow: 0 0 25px -5px rgba(245, 158, 11, 0.25);
+        }
+        .glow-critical {
+            box-shadow: 0 0 25px -5px rgba(239, 68, 68, 0.25);
+        }
+
+        /* Custom Scrollbar */
+        ::-webkit-scrollbar {
+            width: 6px;
+        }
+        ::-webkit-scrollbar-track {
+            background: #090d16;
+        }
+        ::-webkit-scrollbar-thumb {
+            background: #1e293b;
+            border-radius: 3px;
+        }
+        ::-webkit-scrollbar-thumb:hover {
+            background: #334155;
+        }
+    </style>
+</head>
+<body class="min-h-screen flex flex-col justify-between selection:bg-cyan-500 selection:text-white">
+
+    <!-- Header Navigation -->
+    <header class="border-b border-slate-800 bg-slate-950/80 sticky top-0 z-50 backdrop-blur-md">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-16 flex items-center justify-between">
+            <div class="flex items-center space-x-3">
+                <div class="w-9 h-9 rounded-lg bg-cyan-500/10 border border-cyan-500/30 flex items-center justify-center text-cyan-400">
+                    <i class="fa-solid fa-microchip text-lg"></i>
+                </div>
+                <div>
+                    <h1 class="font-bold text-slate-100 text-base sm:text-lg tracking-tight">Mental OS Diagnostic</h1>
+                    <p class="text-xs text-slate-400 hidden sm:block font-mono">System Engineering Framework v2.4</p>
+                </div>
+            </div>
+            <div class="flex items-center space-x-2">
+                <button id="btn-reset" class="px-3 py-1.5 rounded-lg text-xs font-medium text-slate-400 hover:text-slate-200 hover:bg-slate-800 transition flex items-center gap-1.5">
+                    <i class="fa-solid fa-rotate-right"></i> Reset
+                </button>
+                <button id="btn-quick-log" class="px-3.5 py-1.5 rounded-lg text-xs font-semibold bg-cyan-500/10 text-cyan-400 border border-cyan-500/30 hover:bg-cyan-500/20 transition flex items-center gap-1.5">
+                    <i class="fa-solid fa-bookmark"></i> Lưu Nhật Ký
+                </button>
+            </div>
+        </div>
+    </header>
+
+    <!-- Main Content Body -->
+    <main class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6 w-full flex-1">
+        
+        <!-- Intro Banner -->
+        <div class="mb-6 p-4 rounded-xl glass-card border border-cyan-500/20 bg-gradient-to-r from-slate-900/90 via-slate-900/50 to-cyan-950/20 flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
+            <div>
+                <h2 class="text-sm font-semibold text-cyan-400 font-mono uppercase tracking-wider mb-1"><i class="fa-solid fa-terminal mr-2"></i>Chẩn đoán Hệ Thống Vận Hành Tinh Thần</h2>
+                <p class="text-xs text-slate-300 max-w-3xl leading-relaxed">
+                    Đánh giá sức khỏe tinh thần dựa trên tư duy kỹ thuật hệ thống. Đánh giá 4 lớp hạ tầng cốt lõi để phát hiện điểm nghẽn (bottleneck) và áp dụng quy trình khắc phục First Principles.
+                </p>
+            </div>
+            <div class="text-xs text-slate-400 font-mono bg-slate-950/60 px-3 py-2 rounded-lg border border-slate-800 shrink-0">
+                <i class="fa-solid fa-clock text-cyan-400 mr-1.5"></i>Real-time Monitoring
+            </div>
+        </div>
+
+        <div class="grid grid-cols-1 lg:grid-cols-12 gap-6">
+            
+            <!-- Left Column: Input Sliders (7 Cols) -->
+            <div class="lg:col-span-7 space-y-4">
+                
+                <!-- Layer 1: Hardware & Biology -->
+                <div class="glass-card rounded-xl p-5 relative overflow-hidden group hover:border-slate-700 transition">
+                    <div class="flex justify-between items-start mb-3">
+                        <div class="flex items-center gap-3">
+                            <div class="w-8 h-8 rounded-lg bg-emerald-500/10 text-emerald-400 flex items-center justify-center border border-emerald-500/20">
+                                <i class="fa-solid fa-battery-three-quarters"></i>
+                            </div>
+                            <div>
+                                <h3 class="font-semibold text-sm text-slate-100">1. Hạ Tầng & Sinh Học (Hardware)</h3>
+                                <p class="text-xs text-slate-400">Giấc ngủ, dinh dưỡng, nước, vận động thể chất</p>
+                            </div>
+                        </div>
+                        <span id="val-hardware" class="font-mono text-lg font-bold text-emerald-400 bg-emerald-950/40 px-2.5 py-0.5 rounded border border-emerald-800/50">7/10</span>
+                    </div>
+                    <input type="range" id="input-hardware" min="0" max="10" value="7" step="1" class="w-full">
+                    <div class="flex justify-between text-[10px] text-slate-500 font-mono mt-2">
+                        <span>0: Cạn kiệt / Mất ngủ</span>
+                        <span>5: Trung bình</span>
+                        <span>10: Năng lượng tối đa</span>
+                    </div>
+                </div>
+
+                <!-- Layer 2: Cognitive Capacity & Load -->
+                <div class="glass-card rounded-xl p-5 relative overflow-hidden group hover:border-slate-700 transition">
+                    <div class="flex justify-between items-start mb-3">
+                        <div class="flex items-center gap-3">
+                            <div class="w-8 h-8 rounded-lg bg-sky-500/10 text-sky-400 flex items-center justify-center border border-sky-500/20">
+                                <i class="fa-solid fa-memory"></i>
+                            </div>
+                            <div>
+                                <h3 class="font-semibold text-sm text-slate-100">2. Dung Lượng Tải & RAM (Cognitive Load)</h3>
+                                <p class="text-xs text-slate-400">Trạng thái trống bộ nhớ (Thấp: Quá tải tiến trình ngầm, Cao: Thông thoáng)</p>
+                            </div>
+                        </div>
+                        <span id="val-load" class="font-mono text-lg font-bold text-sky-400 bg-sky-950/40 px-2.5 py-0.5 rounded border border-sky-800/50">6/10</span>
+                    </div>
+                    <input type="range" id="input-load" min="0" max="10" value="6" step="1" class="w-full">
+                    <div class="flex justify-between text-[10px] text-slate-500 font-mono mt-2">
+                        <span>0: Tràn RAM / Tê liệt</span>
+                        <span>5: Vừa đủ dùng</span>
+                        <span>10: Bộ nhớ trống hoàn hảo</span>
+                    </div>
+                </div>
+
+                <!-- Layer 3: Circuit Breakers -->
+                <div class="glass-card rounded-xl p-5 relative overflow-hidden group hover:border-slate-700 transition">
+                    <div class="flex justify-between items-start mb-3">
+                        <div class="flex items-center gap-3">
+                            <div class="w-8 h-8 rounded-lg bg-amber-500/10 text-amber-400 flex items-center justify-center border border-amber-500/20">
+                                <i class="fa-solid fa-bolt-lightning"></i>
+                            </div>
+                            <div>
+                                <h3 class="font-semibold text-sm text-slate-100">3. Cầu Chì Tự Ngắt (Circuit Breakers)</h3>
+                                <p class="text-xs text-slate-400">Năng lực cắt lỗ suy nghĩ tiêu cực & chống lặp tư duy (Rumination)</p>
+                            </div>
+                        </div>
+                        <span id="val-circuit" class="font-mono text-lg font-bold text-amber-400 bg-amber-950/40 px-2.5 py-0.5 rounded border border-amber-800/50">4/10</span>
+                    </div>
+                    <input type="range" id="input-circuit" min="0" max="10" value="4" step="1" class="w-full">
+                    <div class="flex justify-between text-[10px] text-slate-500 font-mono mt-2">
+                        <span>0: Cuốn theo suy nghĩ tiêu cực</span>
+                        <span>5: Tự ngắt chậm</span>
+                        <span>10: Cắt lỗ suy nghĩ lập tức</span>
+                    </div>
+                </div>
+
+                <!-- Layer 4: Data Verification -->
+                <div class="glass-card rounded-xl p-5 relative overflow-hidden group hover:border-slate-700 transition">
+                    <div class="flex justify-between items-start mb-3">
+                        <div class="flex items-center gap-3">
+                            <div class="w-8 h-8 rounded-lg bg-purple-500/10 text-purple-400 flex items-center justify-center border border-purple-500/20">
+                                <i class="fa-solid fa-filter"></i>
+                            </div>
+                            <div>
+                                <h3 class="font-semibold text-sm text-slate-100">4. Bộ Lọc Dữ Liệu (Data Verification)</h3>
+                                <p class="text-xs text-slate-400">Khả năng tách biệt Sự thật khách quan (Data) và Nhiễu cảm xúc (Noise)</p>
+                            </div>
+                        </div>
+                        <span id="val-data" class="font-mono text-lg font-bold text-purple-400 bg-purple-950/40 px-2.5 py-0.5 rounded border border-purple-800/50">5/10</span>
+                    </div>
+                    <input type="range" id="input-data" min="0" max="10" value="5" step="1" class="w-full">
+                    <div class="flex justify-between text-[10px] text-slate-500 font-mono mt-2">
+                        <span>0: Bị cảm xúc chi phối</span>
+                        <span>5: Đang phân tích</span>
+                        <span>10: Khách quan tuyệt đối</span>
+                    </div>
+                </div>
+
+            </div>
+
+            <!-- Right Column: System Status & Actionable Output (5 Cols) -->
+            <div class="lg:col-span-5 space-y-4 flex flex-col justify-between">
+                
+                <!-- Main Status Monitor -->
+                <div id="status-card" class="glass-card rounded-xl p-6 relative overflow-hidden transition-all duration-300">
+                    <div class="flex items-center justify-between mb-4">
+                        <span class="text-xs font-mono uppercase tracking-wider text-slate-400">OVERALL SYSTEM HEALTH</span>
+                        <span id="system-score-badge" class="font-mono text-xs font-bold px-2.5 py-1 rounded-full bg-slate-800 text-slate-300">
+                            Score: 55/100
+                        </span>
+                    </div>
+
+                    <div class="flex items-center gap-4 mb-4">
+                        <div id="status-icon-box" class="w-14 h-14 rounded-2xl flex items-center justify-center text-2xl shrink-0 transition-colors">
+                            <i id="status-icon" class="fa-solid fa-shield-halved"></i>
+                        </div>
+                        <div>
+                            <div id="status-title" class="text-xl font-bold text-slate-100 tracking-tight">OPTIMAL OPERATIONAL</div>
+                            <div id="status-desc" class="text-xs text-slate-400 mt-1">Hệ thống phản hồi ổn định. Không phát hiện điểm nghẽn nguy hiểm.</div>
+                        </div>
+                    </div>
+
+                    <!-- Health Gauge Progress Bar -->
+                    <div class="space-y-1">
+                        <div class="flex justify-between text-xs font-mono text-slate-400">
+                            <span>System Load Factor</span>
+                            <span id="health-percentage">55%</span>
+                        </div>
+                        <div class="w-full h-2.5 bg-slate-900 rounded-full overflow-hidden border border-slate-800">
+                            <div id="health-bar" class="h-full bg-emerald-500 transition-all duration-500 w-[55%]"></div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Bottleneck Detection Box -->
+                <div class="glass-card rounded-xl p-5 border-l-4 border-l-amber-500">
+                    <div class="flex items-center gap-2 text-amber-400 text-xs font-mono font-semibold uppercase mb-2">
+                        <i class="fa-solid fa-triangle-exclamation"></i>
+                        <span>Bottleneck Detected (Điểm Nghẽn Chính)</span>
+                    </div>
+                    <h4 id="bottleneck-title" class="text-sm font-semibold text-slate-200 mb-1">Cầu Chì Tự Ngắt Bị Quá Tải</h4>
+                    <p id="bottleneck-desc" class="text-xs text-slate-400 leading-relaxed">
+                        Bạn đang bị mắc kẹt vào các vòng lặp tư duy lặp đi lặp lại. Bộ não không kích hoạt được cơ chế cắt lỗ cảm xúc.
+                    </p>
+                </div>
+
+                <!-- First Principles Action Recommendation -->
+                <div class="glass-card rounded-xl p-5 border-l-4 border-l-cyan-500">
+                    <div class="flex items-center gap-2 text-cyan-400 text-xs font-mono font-semibold uppercase mb-2">
+                        <i class="fa-solid fa-wrench"></i>
+                        <span>First Principles Protocol (Hành Động Khắc Phục)</span>
+                    </div>
+                    <ul id="action-list" class="text-xs text-slate-300 space-y-2 leading-relaxed">
+                        <li class="flex items-start gap-2">
+                            <i class="fa-solid fa-check text-cyan-400 mt-0.5 shrink-0"></i>
+                            <span>Thiết lập hạn chót Stop-Loss: Đặt đồng hồ 5 phút để dừng suy nghĩ bài toán hiện tại.</span>
+                        </li>
+                        <li class="flex items-start gap-2">
+                            <i class="fa-solid fa-check text-cyan-400 mt-0.5 shrink-0"></i>
+                            <span>Chuyển sang hành động thể chất ngay lập tức để ngắt mạch điện não bộ.</span>
+                        </li>
+                    </ul>
+                </div>
+
+            </div>
+
+        </div>
+
+        <!-- History Log Section -->
+        <section class="mt-8">
+            <div class="flex items-center justify-between mb-4">
+                <h3 class="text-sm font-semibold text-slate-200 font-mono uppercase tracking-wider flex items-center gap-2">
+                    <i class="fa-solid fa-list-check text-cyan-400"></i> Nhật Ký Trạng Thái (System Logs)
+                </h3>
+                <button id="btn-clear-logs" class="text-xs text-slate-500 hover:text-slate-300 transition">
+                    Xóa lịch sử
+                </button>
+            </div>
+            <div class="glass-card rounded-xl p-4 overflow-x-auto">
+                <table class="w-full text-left text-xs text-slate-300 font-mono">
+                    <thead class="text-[11px] text-slate-500 uppercase border-b border-slate-800">
+                        <tr>
+                            <th class="pb-2">Thời Gian</th>
+                            <th class="pb-2">Tổng Điểm</th>
+                            <th class="pb-2">Trạng Thái</th>
+                            <th class="pb-2">Điểm Nghẽn</th>
+                            <th class="pb-2 text-right">Chi Tiết (HW/LOAD/CB/DATA)</th>
+                        </tr>
+                    </thead>
+                    <tbody id="logs-tbody" class="divide-y divide-slate-800/50">
+                        <tr class="text-slate-500 italic">
+                            <td colspan="5" class="py-4 text-center">Chưa có bản ghi nhật ký nào. Nhấn "Lưu Nhật Ký" để lưu lại trạng thái hiện tại.</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </section>
+
+    </main>
+
+    <!-- Footer -->
+    <footer class="border-t border-slate-800/80 bg-slate-950 py-4 mt-8">
+        <div class="max-w-7xl mx-auto px-4 text-center text-xs text-slate-500 font-mono">
+            Mental OS Diagnostic System &bull; Designed for Cognitive Resilience & Execution
+        </div>
+    </footer>
+
+    <!-- Notification Toast -->
+    <div id="toast" class="fixed bottom-5 right-5 px-4 py-3 rounded-lg bg-slate-800 text-slate-100 border border-slate-700 shadow-xl text-xs flex items-center gap-2 opacity-0 pointer-events-none transition-all duration-300 translate-y-2 z-50">
+        <i id="toast-icon" class="fa-solid fa-circle-check text-emerald-400"></i>
+        <span id="toast-msg">Đã lưu nhật ký trạng thái thành công!</span>
+    </div>
+
+    <!-- Application Logic -->
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            // Slider Elements
+            const sliders = {
+                hardware: document.getElementById('input-hardware'),
+                load: document.getElementById('input-load'),
+                circuit: document.getElementById('input-circuit'),
+                data: document.getElementById('input-data')
+            };
+
+            const labels = {
+                hardware: document.getElementById('val-hardware'),
+                load: document.getElementById('val-load'),
+                circuit: document.getElementById('val-circuit'),
+                data: document.getElementById('val-data')
+            };
+
+            // Status Display Elements
+            const statusCard = document.getElementById('status-card');
+            const statusIconBox = document.getElementById('status-icon-box');
+            const statusIcon = document.getElementById('status-icon');
+            const statusTitle = document.getElementById('status-title');
+            const statusDesc = document.getElementById('status-desc');
+            const healthPercentage = document.getElementById('health-percentage');
+            const healthBar = document.getElementById('health-bar');
+            const systemScoreBadge = document.getElementById('system-score-badge');
+
+            // Bottleneck & Action Elements
+            const bottleneckTitle = document.getElementById('bottleneck-title');
+            const bottleneckDesc = document.getElementById('bottleneck-desc');
+            const actionList = document.getElementById('action-list');
+
+            // Log Elements
+            const btnReset = document.getElementById('btn-reset');
+            const btnQuickLog = document.getElementById('btn-quick-log');
+            const btnClearLogs = document.getElementById('btn-clear-logs');
+            const logsTbody = document.getElementById('logs-tbody');
+
+            // Toast Elements
+            const toast = document.getElementById('toast');
+            const toastMsg = document.getElementById('toast-msg');
+
+            // App State
+            let logs = JSON.parse(localStorage.getItem('mental_os_logs') || '[]');
+
+            // Update UI from Sliders
+            function calculateDiagnostic() {
+                const hw = parseInt(sliders.hardware.value);
+                const load = parseInt(sliders.load.value);
+                const circuit = parseInt(sliders.circuit.value);
+                const data = parseInt(sliders.data.value);
+
+                // Update Labels
+                labels.hardware.textContent = `${hw}/10`;
+                labels.load.textContent = `${load}/10`;
+                labels.circuit.textContent = `${circuit}/10`;
+                labels.data.textContent = `${data}/10`;
+
+                // Calculate Total Score (Out of 100)
+                const totalScore = Math.round(((hw + load + circuit + data) / 40) * 100);
+
+                systemScoreBadge.textContent = `Score: ${totalScore}/100`;
+                healthPercentage.textContent = `${totalScore}%`;
+                healthBar.style.width = `${totalScore}%`;
+
+                // Identify Primary Bottleneck (Lowest Score Layer)
+                const scores = [
+                    { name: 'Hardware', score: hw, title: 'Hạ Tầng Sinh Học Suy Giảm', desc: 'Năng lượng thể chất, giấc ngủ hoặc dinh dưỡng không đủ để duy trì vận hành thần kinh.', recs: ['Nạp 500ml nước ấm và đi dạo nhẹ 10 phút ngay.', 'Đặt lịch ngủ sớm trước 11h tối nay.', 'Tạm ngưng tiêu thụ Caffeine hoặc chất kích thích sau 2h chiều.'] },
+                    { name: 'Load', score: load, title: 'Tải Trọng Nhận Thức Quá Tải (Tràn RAM)', desc: 'Có quá nhiều tiến trình ngầm (suy nghĩ, lo lắng) đang chiếm dụng bộ nhớ ngắn hạn.', recs: ['Thực hiện bài tập Brain Dump: Viết hết mọi thứ trong đầu ra giấy.', 'Tắt bớt thông báo ứng dụng và làm sạch không gian làm việc.', 'Đơn giản hóa: Chỉ chọn DUY NHẤT 1 việc cần làm trong 1 giờ tới.'] },
+                    { name: 'Circuit', score: circuit, title: 'Cầu Chì Tự Ngắt Bị Tê Liệt', desc: 'Không thể cắt đứt các vòng lặp suy nghĩ tiêu cực hoặc tâm lý tiếc nuối chi phí chìm.', recs: ['Áp dụng quy tắc Stop-Loss: Cho phép suy nghĩ đúng 3 phút nữa rồi dừng.', 'Chuyển đổi trạng thái bằng vận động cơ thể (chống đẩy, vươn người).', 'Đặt ra câu hỏi: "Suy nghĩ này có tạo ra hành động cụ thể nào không?"'] },
+                    { name: 'Data', score: data, title: 'Bộ Lọc Nhiễu Cảm Xúc Hoạt Động Kém', desc: 'Đang bị nhầm lẫn giữa Cảm xúc nhất thời (Noise) và Sự thật khách quan (Data).', recs: ['Chạy Bài kiểm tra Tờ giấy trắng (Blank Slate Test).', 'Tách biệt câu chuyện: Viết ra danh sách "Thực tế khách quan" vs "Dự đoán cảm xúc".', 'Hỏi bản thân: "Chỉ số thực tế nào chứng minh suy nghĩ này là đúng?"'] }
+                ];
+
+                // Sort to find bottleneck
+                scores.sort((a, b) => a.score - b.score);
+                const bottleneck = scores[0];
+
+                // Render Bottleneck & Recommendations
+                bottleneckTitle.textContent = bottleneck.title;
+                bottleneckDesc.textContent = bottleneck.desc;
+                actionList.innerHTML = bottleneck.recs.map(rec => `
+                    <li class="flex items-start gap-2">
+                        <i class="fa-solid fa-check text-cyan-400 mt-0.5 shrink-0"></i>
+                        <span>${rec}</span>
+                    </li>
+                `).join('');
+
+                // Render Overall Status
+                statusCard.classList.remove('glow-optimal', 'glow-caution', 'glow-critical');
+                if (totalScore >= 70 && bottleneck.score >= 5) {
+                    // OPTIMAL
+                    statusCard.classList.add('glow-optimal');
+                    statusIconBox.className = "w-14 h-14 rounded-2xl flex items-center justify-center text-2xl shrink-0 transition-colors bg-emerald-500/10 text-emerald-400 border border-emerald-500/30";
+                    statusIcon.className = "fa-solid fa-shield-halved";
+                    statusTitle.textContent = "OPTIMAL STATE";
+                    statusTitle.className = "text-xl font-bold text-emerald-400 tracking-tight";
+                    statusDesc.textContent = "Hệ thống vận hành mượt mà. Năng lượng nhận thức sẵn sàng cho các nhiệm vụ đòi hỏi tư duy cao.";
+                    healthBar.className = "h-full bg-emerald-500 transition-all duration-500";
+                } else if (totalScore >= 45 || bottleneck.score >= 3) {
+                    // CAUTION
+                    statusCard.classList.add('glow-caution');
+                    statusIconBox.className = "w-14 h-14 rounded-2xl flex items-center justify-center text-2xl shrink-0 transition-colors bg-amber-500/10 text-amber-400 border border-amber-500/30";
+                    statusIcon.className = "fa-solid fa-triangle-exclamation";
+                    statusTitle.textContent = "SYSTEM CAUTION";
+                    statusTitle.className = "text-xl font-bold text-amber-400 tracking-tight";
+                    statusDesc.textContent = "Xuất hiện sự suy giảm ở 1-2 lớp. Cần điều chỉnh ngay trước khi rơi vào trạng thái quá tải.";
+                    healthBar.className = "h-full bg-amber-500 transition-all duration-500";
+                } else {
+                    // CRITICAL OVERLOAD
+                    statusCard.classList.add('glow-critical');
+                    statusIconBox.className = "w-14 h-14 rounded-2xl flex items-center justify-center text-2xl shrink-0 transition-colors bg-red-500/10 text-red-400 border border-red-500/30";
+                    statusIcon.className = "fa-solid fa-triangle-exclamation";
+                    statusTitle.textContent = "CRITICAL OVERLOAD";
+                    statusTitle.className = "text-xl font-bold text-red-400 tracking-tight";
+                    statusDesc.textContent = "Hệ thống rơi vào trạng thái kiệt sức/tê liệt. Ngừng ngay các quyết định lớn và thực hiện giao thức hồi phục.";
+                    healthBar.className = "h-full bg-red-500 transition-all duration-500";
+                }
+            }
+
+            // Attach listeners to sliders
+            Object.values(sliders).forEach(slider => {
+                slider.addEventListener('input', calculateDiagnostic);
+            });
+
+            // Show Toast Message
+            function showToast(msg) {
+                toastMsg.textContent = msg;
+                toast.classList.remove('opacity-0', 'pointer-events-none', 'translate-y-2');
+                toast.classList.add('opacity-100', 'translate-y-0');
+                setTimeout(() => {
+                    toast.classList.remove('opacity-100', 'translate-y-0');
+                    toast.classList.add('opacity-0', 'pointer-events-none', 'translate-y-2');
+                }, 2500);
+            }
+
+            // Render History Logs
+            function renderLogs() {
+                if (logs.length === 0) {
+                    logsTbody.innerHTML = `
+                        <tr class="text-slate-500 italic">
+                            <td colspan="5" class="py-4 text-center">Chưa có bản ghi nhật ký nào. Nhấn "Lưu Nhật Ký" để lưu lại trạng thái hiện tại.</td>
+                        </tr>
+                    `;
+                    return;
+                }
+
+                logsTbody.innerHTML = logs.map(log => {
+                    let statusColor = 'text-emerald-400';
+                    if (log.status === 'CAUTION') statusColor = 'text-amber-400';
+                    if (log.status === 'CRITICAL') statusColor = 'text-red-400';
+
+                    return `
+                        <tr class="hover:bg-slate-800/30 transition">
+                            <td class="py-2.5 font-sans text-slate-400">${log.timestamp}</td>
+                            <td class="py-2.5 font-bold">${log.score}/100</td>
+                            <td class="py-2.5 font-bold ${statusColor}">${log.status}</td>
+                            <td class="py-2.5 text-slate-300 font-sans">${log.bottleneck}</td>
+                            <td class="py-2.5 text-right font-mono text-slate-400">${log.hw}/${log.load}/${log.circuit}/${log.data}</td>
+                        </tr>
+                    `;
+                }).join('');
+            }
+
+            // Quick Log Button
+            btnQuickLog.addEventListener('click', () => {
+                const hw = parseInt(sliders.hardware.value);
+                const load = parseInt(sliders.load.value);
+                const circuit = parseInt(sliders.circuit.value);
+                const data = parseInt(sliders.data.value);
+                const totalScore = Math.round(((hw + load + circuit + data) / 40) * 100);
+
+                let status = 'OPTIMAL';
+                if (totalScore < 45) status = 'CRITICAL';
+                else if (totalScore < 70) status = 'CAUTION';
+
+                const now = new Date();
+                const timeStr = `${now.getHours().toString().padStart(2, '0')}:${now.getMinutes().toString().padStart(2, '0')} - ${now.getDate()}/${now.getMonth() + 1}`;
+
+                const logEntry = {
+                    timestamp: timeStr,
+                    score: totalScore,
+                    status: status,
+                    bottleneck: bottleneckTitle.textContent,
+                    hw, load, circuit, data
+                };
+
+                logs.unshift(logEntry);
+                if (logs.length > 10) logs.pop(); // Keep last 10
+                localStorage.setItem('mental_os_logs', JSON.stringify(logs));
+
+                renderLogs();
+                showToast('Đã lưu nhật ký trạng thái hệ thống!');
+            });
+
+            // Reset Button
+            btnReset.addEventListener('click', () => {
+                sliders.hardware.value = 7;
+                sliders.load.value = 6;
+                sliders.circuit.value = 4;
+                sliders.data.value = 5;
+                calculateDiagnostic();
+                showToast('Đã đặt lại các thông số kiểm tra!');
+            });
+
+            // Clear Logs Button
+            btnClearLogs.addEventListener('click', () => {
+                logs = [];
+                localStorage.removeItem('mental_os_logs');
+                renderLogs();
+                showToast('Đã xóa lịch sử nhật ký!');
+            });
+
+            // Initial Run
+            calculateDiagnostic();
+            renderLogs();
+        });
+    </script>
+</body>
+</html>
